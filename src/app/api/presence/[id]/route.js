@@ -1,24 +1,25 @@
-import { getJourPresenceById, updateJourPresence, deleteJourPresence } from '@/lib/jourpresence'
+import {  getPresenceById, updatePresence, deletePresence } from '@/lib/presence'
 import { NextResponse } from 'next/server'
 
 export async function GET(_, { params }) {
     const id = params.id
 
-    const jour = await getJourPresenceById(id)
+    const presence = await getPresenceById(id)
 
-    if (!jour) {
-        return NextResponse.json({ message: 'Jour de présence non trouvé' }, { status: 404 })
+    if (!presence) {
+        return NextResponse.json({ message: 'Présence non trouvée' }, { status: 404 })
     }
 
-    return NextResponse.json(jour)
+    return NextResponse.json(presence)
 }
+
 
 export async function PUT(request, { params }) {
     const id = params.id
     const data = await request.json()
 
     try {
-        const updated = await updateJourPresence(id, data)
+        const updated = await updatePresence(id, data)
         return NextResponse.json(updated)
     } catch (error) {
         return NextResponse.json({ message: 'Erreur lors de la mise à jour' }, { status: 400 })
@@ -29,8 +30,8 @@ export async function DELETE(_, { params }) {
     const id = params.id
 
     try {
-        await deleteJourPresence(id)
-        return NextResponse.json({ message: 'Jour supprimé' })
+        await deletePresence(id)
+        return NextResponse.json({ message: 'Présence supprimée' })
     } catch (error) {
         return NextResponse.json({ message: 'Erreur lors de la suppression' }, { status: 400 })
     }
