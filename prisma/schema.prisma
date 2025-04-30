@@ -9,7 +9,7 @@ datasource db {
 
 model Utilisateur {
   id_utilisateur String   @id @default(uuid())
-  login          String
+  login          String   @unique
   mot_de_passe   String
   role           Role     @default(PARENT)
   createdAt      DateTime @default(now())
