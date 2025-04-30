@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Utilisateur {
+  id_utilisateur String   @id @default(uuid())
+  login          String
+  mot_de_passe   String
+  role           Role     @default(PARENT)
+  createdAt      DateTime @default(now())
+}
+
+model Enfant {
+  id_enfant        String     @id @default(uuid())
+  nom              String
+  prenom           String
+  age              Int
+  adresse          String
+  telephone_parent String
+  est_archive      Boolean    @default(false)
+  presences        Presence[]
+  createdAt        DateTime   @default(now())
+}
+
+model JourPresence {
+  id_jour      String     @id @default(uuid())
+  jour_semaine String
+  presences    Presence[]
+  createdAt    DateTime   @default(now())
+}
+
+model Presence {
+  id_presence String       @id @default(uuid())
+  id_enfant   String
+  id_jour     String
+  matin       Boolean
+  apres_midi  Boolean
+  enfant      Enfant       @relation(fields: [id_enfant], references: [id_enfant])
+  jour        JourPresence @relation(fields: [id_jour], references: [id_jour])
+  createdAt   DateTime     @default(now())
+}
+
+enum Role {
+  ADMIN
+  RESPONSABLE
+  EDUCATEUR
+  PARENT
+}
