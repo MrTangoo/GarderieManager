@@ -2,14 +2,13 @@
 
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
 export default function LoginForm() {
     const [login, setLogin] = useState('')
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')
-    const router = useRouter()
     const searchParams = useSearchParams()
     const callbackUrl = searchParams.get('callbackUrl') || '/'
 
@@ -19,11 +18,10 @@ export default function LoginForm() {
             login,
             mot_de_passe: password,
             callbackUrl,
+            redirect: true, // facultatif car c'est la valeur par défaut
         })
 
-        if (res.ok && res.url) {
-            router.push(res.url)
-        } else {
+        if (!res?.ok) {
             setError('Identifiants invalides')
         }
     }
