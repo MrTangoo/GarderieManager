@@ -2,27 +2,31 @@
 
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
 export default function LoginForm() {
     const [login, setLogin] = useState('')
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')
+    const router = useRouter()
     const searchParams = useSearchParams()
     const callbackUrl = searchParams.get('callbackUrl') || '/'
 
     const handleSubmit = async (e) => {
         e.preventDefault()
+
         const res = await signIn('credentials', {
             login,
             mot_de_passe: password,
             callbackUrl,
-            redirect: true, // facultatif car c'est la valeur par défaut
+            redirect: false,
         })
 
-        if (!res?.ok) {
+        if (res?.error) {
             setError('Identifiants invalides')
+        } else {
+            window.location.href = "/";
         }
     }
 
