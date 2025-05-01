@@ -22,8 +22,8 @@ export default function LoginForm() {
             callbackUrl,
         })
 
-        if (res.ok) {
-            router.push(callbackUrl)
+        if (res?.ok && res?.url) {
+            router.push(res.url)
         } else {
             setError('Identifiants invalides')
         }
