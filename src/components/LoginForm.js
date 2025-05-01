@@ -16,13 +16,12 @@ export default function LoginForm() {
     const handleSubmit = async (e) => {
         e.preventDefault()
         const res = await signIn('credentials', {
-            redirect: false,
             login,
             mot_de_passe: password,
             callbackUrl,
         })
 
-        if (res?.ok && res?.url) {
+        if (res.ok && res.url) {
             router.push(res.url)
         } else {
             setError('Identifiants invalides')
