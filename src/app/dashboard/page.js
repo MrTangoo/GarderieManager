@@ -2,44 +2,48 @@
 
 import { useEffect, useState } from 'react'
 import EnfantCard from '@/components/EnfantCard'
-import { UserPlus } from 'lucide-react';
-import { Printer } from 'lucide-react';
-
+import { UserPlus, Printer, Search, LoaderCircle } from 'lucide-react'
+import Link from 'next/link'
 
 export default function DashboardPage() {
     const [groupedData, setGroupedData] = useState({})
+    const [searchTerm, setSearchTerm] = useState('')
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        fetch('/api/presence')
-            .then((res) => res.json())
-            .then((data) => {
+        const fetchPresences = async () => {
+            try {
+                const res = await fetch('/api/presence')
+                const data = await res.json()
+
                 const grouped = {}
-                data.forEach((presence) => {
-                    const enfantId = presence.enfant.id_enfant
-                    if (!grouped[enfantId]) {
-                        grouped[enfantId] = {
-                            ...presence.enfant,
-                            presences: [],
-                        }
+                for (const p of data) {
+                    const id = p.enfant.id_enfant
+                    if (!grouped[id]) {
+                        grouped[id] = { ...p.enfant, presences: [] }
                     }
-                    grouped[enfantId].presences.push({
-                        jour: presence.jour.jour_semaine,
-                        matin: presence.matin,
-                        apres_midi: presence.apres_midi,
+                    grouped[id].presences.push({
+                        jour: p.jour.jour_semaine,
+                        matin: p.matin,
+                        apres_midi: p.apres_midi,
                     })
-                })
+                }
+
                 setGroupedData(grouped)
-            })
+            } catch (e) {
+                console.error('Erreur de chargement des données :', e)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchPresences()
     }, [])
 
     const handleDelete = async (id) => {
-        const confirmed = confirm('Êtes-vous sûr de vouloir supprimer cet enfant ?')
-        if (!confirmed) return
+        if (!confirm("Êtes-vous sûr de vouloir supprimer cet enfant ?")) return
 
-        const res = await fetch(`/api/enfants/${id}`, {
-            method: 'DELETE',
-        })
-
+        const res = await fetch(`/api/enfants/${id}`, { method: 'DELETE' })
         if (res.ok) {
             setGroupedData((prev) => {
                 const updated = { ...prev }
@@ -69,23 +73,64 @@ export default function DashboardPage() {
         }
     }
 
+    const filteredEnfants = Object.values(groupedData)
+        .filter((e) => !e.est_archive)
+        .filter((e) =>
+            `${e.prenom} ${e.nom}`.toLowerCase().includes(searchTerm.toLowerCase())
+        )
 
     return (
-        <div className="p-6 pt-16">
-            <h1 className="text-2xl font-bold mb-6">Liste des enfants et leurs présences</h1>
-
-            {Object.values(groupedData)
-                .filter((enfant) => !enfant.est_archive)
-                .map((enfant) => (
-                    <EnfantCard key={enfant.id_enfant} enfant={enfant} onDelete={handleDelete} onArchive={handleArchive}/>
-                ))}
-
-            <div className="flex gap-2">
-                <button className="bg-green-500 text-white p-2 rounded inline-flex"><UserPlus/>Ajouter un enfant</button>
-                <button className="bg-blue-500 text-white p-2 rounded inline-flex"><Printer />Présence hebdomadaire</button>
-                <button  className="bg-blue-500 text-white p-2 rounded inline-flex"><Printer />Total Présence</button>
+        <div className="p-6 pt-20 max-w-4xl mx-auto space-y-6">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+                <h1 className="text-3xl font-bold text-center md:text-left">
+                    Liste des enfants
+                </h1>
+                <div className="flex items-center border rounded-md px-3 py-2 w-full md:w-72">
+                    <Search className="w-4 h-4 text-gray-500 mr-2" />
+                    <input
+                        type="text"
+                        placeholder="Rechercher un enfant"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full outline-none"
+                    />
+                </div>
             </div>
 
+            {loading ? (
+                <div className="flex justify-center items-center py-20">
+                    <LoaderCircle className="w-6 h-6 animate-spin text-gray-500" />
+                </div>
+            ) : (
+                <div className="space-y-6">
+                    {filteredEnfants.map((enfant) => (
+                        <EnfantCard
+                            key={enfant.id_enfant}
+                            enfant={enfant}
+                            onDelete={handleDelete}
+                            onArchive={handleArchive}
+                        />
+                    ))}
+                </div>
+            )}
+
+            <div className="flex flex-col md:flex-row justify-center gap-4 mt-8">
+                <Link
+                    href="/addEnfant"
+                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded flex items-center gap-2"
+                >
+                    <UserPlus className="w-4 h-4" />
+                    Ajouter un enfant
+                </Link>
+                <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2">
+                    <Printer className="w-4 h-4" />
+                    Présence hebdomadaire
+                </button>
+                <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded flex items-center gap-2">
+                    <Printer className="w-4 h-4" />
+                    Total Présence
+                </button>
+            </div>
         </div>
     )
 }

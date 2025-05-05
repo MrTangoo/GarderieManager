@@ -1,4 +1,12 @@
+import { X, Check } from 'lucide-react'
+
+const joursOrdre = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi']
+
 export default function EnfantTable({ presences }) {
+    const presencesTriees = [...presences].sort(
+        (a, b) => joursOrdre.indexOf(a.jour) - joursOrdre.indexOf(b.jour)
+    )
+
     return (
         <table className="w-full text-sm border">
             <thead className="bg-gray-100">
@@ -9,11 +17,15 @@ export default function EnfantTable({ presences }) {
             </tr>
             </thead>
             <tbody>
-            {presences.map((p, idx) => (
+            {presencesTriees.map(({ jour, matin, apres_midi }, idx) => (
                 <tr key={idx}>
-                    <td className="border p-2 capitalize">{p.jour}</td>
-                    <td className="border p-2">{p.matin ? '✔️' : '❌'}</td>
-                    <td className="border p-2">{p.apres_midi ? '✔️' : '❌'}</td>
+                    <td className="border p-2 capitalize">{jour}</td>
+                    <td className="border p-2">
+                        {matin ? <Check className="text-green-500" /> : <X className="text-red-500" />}
+                    </td>
+                    <td className="border p-2">
+                        {apres_midi ? <Check className="text-green-500" /> : <X className="text-red-500" />}
+                    </td>
                 </tr>
             ))}
             </tbody>

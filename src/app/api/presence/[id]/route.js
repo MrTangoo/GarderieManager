@@ -1,16 +1,19 @@
-import {  getPresenceById, updatePresence, deletePresence } from '@/lib/presence'
+import {updatePresence, deletePresencesByEnfantId, getPresencesByEnfantId} from '@/lib/presence'
 import { NextResponse } from 'next/server'
 
-export async function GET(_, { params }) {
-    const id = params.id
+export async function GET(request, context) {
+    try {
+        const { id } = await context.params
 
-    const presence = await getPresenceById(id)
+        if (!id) {
+            return NextResponse.json({ message: 'ID manquant' }, { status: 400 })
+        }
 
-    if (!presence) {
-        return NextResponse.json({ message: 'Présence non trouvée' }, { status: 404 })
+        const presences = await getPresencesByEnfantId(id)
+        return NextResponse.json(presences)
+    } catch (error) {
+        return NextResponse.json({ message: 'Erreur interne du serveur' }, { status: 500 })
     }
-
-    return NextResponse.json(presence)
 }
 
 
@@ -27,12 +30,15 @@ export async function PUT(request, { params }) {
 }
 
 export async function DELETE(_, { params }) {
-    const id = params.id
+    const { id } = await params;
 
     try {
-        await deletePresence(id)
-        return NextResponse.json({ message: 'Présence supprimée' })
+        await deletePresencesByEnfantId(id);
+        return NextResponse.json({ message: 'Présences supprimées' });
     } catch (error) {
-        return NextResponse.json({ message: 'Erreur lors de la suppression' }, { status: 400 })
+        console.error('Erreur suppression :', error);
+        return NextResponse.json({ message: 'Erreur suppression' }, { status: 500 });
     }
 }
+
+

@@ -20,6 +20,7 @@ export async function PUT(request, { params }) {
         const updated = await updateEnfant(id, data)
         return NextResponse.json(updated)
     } catch (error) {
+        console.error("Erreur mise à jour :", error)
         return NextResponse.json({ message: 'Erreur lors de la mise à jour' }, { status: 400 })
     }
 }
