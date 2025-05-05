@@ -2,14 +2,13 @@
 
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
 export default function LoginForm() {
     const [login, setLogin] = useState('')
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')
-    const router = useRouter()
     const searchParams = useSearchParams()
     const callbackUrl = searchParams.get('callbackUrl') || '/'
 
@@ -26,7 +25,7 @@ export default function LoginForm() {
         if (res?.error) {
             setError('Identifiants invalides')
         } else {
-            window.location.href = "/";
+            window.location.href = "/dashboard";
         }
     }
 

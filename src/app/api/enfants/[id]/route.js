@@ -1,8 +1,8 @@
 import { getEnfantById, updateEnfant, deleteEnfant } from '@/lib/enfant'
 import { NextResponse } from 'next/server'
 
-export async function GET(_, { params }) {
-    const id = params.id
+export async function GET(request, { params }) {
+    const { id } = await params
     const enfant = await getEnfantById(id)
 
     if (!enfant) {
@@ -13,7 +13,7 @@ export async function GET(_, { params }) {
 }
 
 export async function PUT(request, { params }) {
-    const id = params.id
+    const { id } = await params
     const data = await request.json()
 
     try {
@@ -24,13 +24,16 @@ export async function PUT(request, { params }) {
     }
 }
 
-export async function DELETE(_, { params }) {
-    const id = params.id
+export async function DELETE(request, { params }) {
+    const { id } = await params
+    console.log("ID à supprimer :", id)
 
     try {
         await deleteEnfant(id)
         return NextResponse.json({ message: 'Enfant supprimé' })
     } catch (error) {
+        console.error("Erreur suppression :", error)
         return NextResponse.json({ message: 'Erreur lors de la suppression' }, { status: 400 })
     }
 }
+
