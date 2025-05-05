@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { CirclePlus, LoaderCircle } from 'lucide-react'
+import { CirclePlus, LoaderCircle, Pencil  } from 'lucide-react'
 
 export default function EnfantForm({ initialData = null, onSubmit }) {
     const [formData, setFormData] = useState(null)
@@ -98,32 +98,36 @@ export default function EnfantForm({ initialData = null, onSubmit }) {
             <input value={formData.adresse} onChange={e => handleChange('adresse', e.target.value)} placeholder="Adresse" className="border p-2 w-full rounded" required />
 
             <div>
-                <h3 className="font-semibold text-lg mb-2">Présences</h3>
-                <div className="space-y-3">
+                <h3 className="font-semibold text-xl mb-4 border-b pb-2">Présences hebdomadaires</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {jours.map(jour => (
-                        <div key={jour.id_jour} className="flex items-center gap-6">
-                            <span className="w-24 capitalize font-medium">{jour.jour_semaine}</span>
-                            {['matin', 'apres_midi'].map(period => (
-                                <label key={period} className="flex items-center gap-2">
-                                    <input
-                                        type="checkbox"
-                                        checked={formData.presences?.[jour.id_jour]?.[period] || false}
-                                        onChange={e => handlePresenceChange(jour.id_jour, period, e.target.checked)}
-                                    />
-                                    {period === 'matin' ? 'Matin' : 'Après-midi'}
-                                </label>
-                            ))}
+                        <div key={jour.id_jour} className="bg-gray-50 p-4 rounded-lg shadow-sm border">
+                            <div className="text-lg capitalize font-medium text-gray-700 mb-3">{jour.jour_semaine}</div>
+                            <div className="flex gap-4">
+                                {['matin', 'apres_midi'].map(period => (
+                                    <label key={period} className="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            className="h-5 w-5 cursor-pointer"
+                                            checked={formData.presences?.[jour.id_jour]?.[period] || false}
+                                            onChange={e => handlePresenceChange(jour.id_jour, period, e.target.checked)}
+                                        />
+                                        <span className="text-gray-600">{period === 'matin' ? 'Matin' : 'Après-midi'}</span>
+                                    </label>
+                                ))}
+                            </div>
                         </div>
                     ))}
                 </div>
             </div>
 
+
             <div className="flex justify-center">
                 <button
                     type="submit"
-                    className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded shadow flex items-center gap-2"
+                    className=" bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded shadow flex items-center gap-2"
                 >
-                    {initialData ? <>Modifier</> : <><CirclePlus className="w-4 h-4" /> Ajouter</>}
+                    {initialData ? <><Pencil className="w-4 h-4"/> Modifier</> : <><CirclePlus className="w-4 h-4" /> Ajouter</>}
                 </button>
             </div>
         </form>

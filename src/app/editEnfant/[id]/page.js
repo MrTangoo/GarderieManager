@@ -51,8 +51,8 @@ export default function EditEnfantPage() {
                     body: JSON.stringify({
                         id_enfant: id,
                         id_jour,
-                        matin: p.matin,
-                        apres_midi: p.apres_midi,
+                        matin: p.matin ?? false,
+                        apres_midi: p.apres_midi ?? false,
                     }),
                 })
             )
