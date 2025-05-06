@@ -1,14 +1,18 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { CirclePlus, LoaderCircle, Pencil } from 'lucide-react'
+import { CirclePlus, LoaderCircle, Pencil, Phone, House, Baby, Cake, CalendarDays } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { permissions } from '@/lib/permissions'
+import TextInputWithIcon from '@/components/TextInputWithIcon'
+import JourPresenceCard from '@/components/JourPresenceCard'
+
 
 export default function EnfantForm({ initialData = null, onSubmit }) {
     const [formData, setFormData] = useState(null)
     const [jours, setJours] = useState([])
     const [loading, setLoading] = useState(true)
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     const { data: session } = useSession()
     const role = session?.user?.role
@@ -16,47 +20,39 @@ export default function EnfantForm({ initialData = null, onSubmit }) {
     const canEditPresence = permissions[role]?.canEditPresence ?? false
 
     useEffect(() => {
-        const fetchPresencesAndJours = async () => {
+        const fetchData = async () => {
             try {
-                const [joursRes, presRes] = await Promise.all([
-                    fetch('/api/jourpresence'),
-                    initialData ? fetch(`/api/presence/${initialData.id_enfant}`) : null,
-                ])
-
+                const joursRes = await fetch('/api/jourpresence')
                 const joursData = await joursRes.json()
+
                 const orderedDays = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi']
-                joursData.sort((a, b) => orderedDays.indexOf(a.jour_semaine) - orderedDays.indexOf(b.jour_semaine))
+                joursData.sort(
+                    (a, b) =>
+                        orderedDays.indexOf(a.jour_semaine) - orderedDays.indexOf(b.jour_semaine)
+                )
                 setJours(joursData)
 
-                const presMap = {}
-                if (initialData && presRes) {
+                const presences = Object.fromEntries(
+                    joursData.map(j => [j.id_jour, { matin: false, apres_midi: false }])
+                )
+
+                if (initialData) {
+                    const presRes = await fetch(`/api/presence/${initialData.id_enfant}`)
                     const enfantPresences = await presRes.json()
+
                     enfantPresences.forEach(p => {
-                        presMap[p.id_jour] = { matin: p.matin, apres_midi: p.apres_midi }
-                    })
-
-                    setFormData({
-                        prenom: initialData.prenom,
-                        nom: initialData.nom,
-                        age: initialData.age,
-                        adresse: initialData.adresse,
-                        telephone_parent: initialData.telephone_parent,
-                        presences: presMap,
-                    })
-                } else {
-                    joursData.forEach(j => {
-                        presMap[j.id_jour] = { matin: false, apres_midi: false }
-                    })
-
-                    setFormData({
-                        prenom: '',
-                        nom: '',
-                        age: '',
-                        adresse: '',
-                        telephone_parent: '',
-                        presences: presMap,
+                        presences[p.id_jour] = { matin: p.matin, apres_midi: p.apres_midi }
                     })
                 }
+
+                setFormData({
+                    prenom: initialData?.prenom || '',
+                    nom: initialData?.nom || '',
+                    age: initialData?.age || '',
+                    adresse: initialData?.adresse || '',
+                    telephone_parent: initialData?.telephone_parent || '',
+                    presences,
+                })
             } catch (error) {
                 console.error('Erreur lors du chargement des données', error)
             } finally {
@@ -64,7 +60,7 @@ export default function EnfantForm({ initialData = null, onSubmit }) {
             }
         }
 
-        fetchPresencesAndJours()
+        fetchData()
     }, [initialData])
 
     const handleChange = (field, value) => {
@@ -84,12 +80,16 @@ export default function EnfantForm({ initialData = null, onSubmit }) {
         }))
     }
 
-    const getInputClass = () =>
-        `border p-2 rounded ${!canEdit ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`
-
-    const handleSubmit = e => {
+    const handleSubmit = async e => {
         e.preventDefault()
-        onSubmit(formData)
+        setIsSubmitting(true)
+        try {
+            await onSubmit(formData)
+        } catch (err) {
+            console.error(err)
+        } finally {
+            setIsSubmitting(false)
+        }
     }
 
     if (loading || !formData) {
@@ -101,89 +101,104 @@ export default function EnfantForm({ initialData = null, onSubmit }) {
     }
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-6 bg-white shadow-md border p-6 rounded-md">
+        <form
+            onSubmit={handleSubmit}
+            className="space-y-6 bg-white shadow-md border border-gray-200 p-6 rounded-xl"
+        >
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <input
+                <TextInputWithIcon
                     value={formData.prenom}
                     onChange={e => handleChange('prenom', e.target.value)}
                     placeholder="Prénom"
-                    className={getInputClass()}
-                    required
+                    icon={<Baby className="w-5 h-5" />}
                     disabled={!canEdit}
                 />
-                <input
+
+                <TextInputWithIcon
                     value={formData.nom}
                     onChange={e => handleChange('nom', e.target.value)}
                     placeholder="Nom"
-                    className={getInputClass()}
-                    required
+                    icon={<Baby className="w-5 h-5" />}
                     disabled={!canEdit}
                 />
-                <input
+
+                <TextInputWithIcon
                     type="number"
-                    value={formData.age === 0 ? '' : formData.age}
+                    value={formData.age}
                     onChange={e =>
                         handleChange('age', e.target.value === '' ? '' : Number(e.target.value))
                     }
-                    placeholder="Âge"
-                    className={getInputClass()}
-                    required
+                    placeholder="Age"
+                    icon={<Cake className="w-5 h-5" />}
                     disabled={!canEdit}
-                    min="1"
+                    min={1}
                 />
-                <input
+
+                <TextInputWithIcon
                     type="tel"
                     value={formData.telephone_parent}
                     onChange={e => handleChange('telephone_parent', e.target.value)}
                     placeholder="Téléphone parent"
-                    className={getInputClass()}
-                    required
+                    icon={<Phone className="w-4 h-4" />}
                     disabled={!canEdit}
                     pattern="^\+?[0-9]{10,15}$"
                     title="Veuillez entrer un numéro valide (10 à 15 chiffres, avec un '+' possible)"
                 />
             </div>
 
-            <input
+            <TextInputWithIcon
                 value={formData.adresse}
                 onChange={e => handleChange('adresse', e.target.value)}
                 placeholder="Adresse"
-                className={getInputClass()}
-                required
+                icon={<House className="w-5 h-5" />}
                 disabled={!canEdit}
             />
 
             <div>
-                <h3 className="font-semibold text-xl mb-4 border-b pb-2">Présences hebdomadaires</h3>
+                <div className="flex items-center gap-2 mb-4 border-b border-gray-300 pb-2">
+                    <h3 className="font-semibold text-xl text-gray-800">Présences hebdomadaires</h3>
+                    <CalendarDays className="w-6 h-6 text-gray-700" />
+                </div>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {jours.map(jour => (
-                        <div key={jour.id_jour} className="bg-gray-50 p-4 rounded-lg shadow-sm border">
-                            <div className="text-lg capitalize font-medium text-gray-700 mb-3">
-                                {jour.jour_semaine}
-                            </div>
-                            <div className="flex gap-4">
-                                {['matin', 'apres_midi'].map(period => (
-                                    <label key={period} className="flex items-center gap-2 cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            className="h-5 w-5 cursor-pointer"
-                                            checked={formData.presences?.[jour.id_jour]?.[period] || false}
-                                            onChange={e => handlePresenceChange(jour.id_jour, period, e.target.checked)}
-                                            disabled={!canEditPresence}
-                                        />
-                                        <span className="text-gray-600">{period === 'matin' ? 'Matin' : 'Après-midi'}</span>
-                                    </label>
-                                ))}
-                            </div>
-                        </div>
+                        <JourPresenceCard
+                            key={jour.id_jour}
+                            jour={jour}
+                            presences={formData.presences[jour.id_jour]}
+                            onChange={(field, value) =>
+                                handlePresenceChange(jour.id_jour, field, value)
+                            }
+                            disabled={!canEditPresence}
+                        />
                     ))}
                 </div>
             </div>
 
-            <div className="flex justify-center">
-                <button type="submit" className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded shadow flex items-center gap-2">
-                    {initialData ? (
-                        <><Pencil className="w-4 h-4" /> Modifier</>) : (<><CirclePlus className="w-4 h-4" /> Ajouter</>)}
+            <div className="flex justify-center pt-4">
+                <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className={`bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded-xl shadow flex items-center justify-center gap-2 transition-colors w-full sm:w-auto ${
+                        isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
+                >
+                    {isSubmitting ? (
+                        <>
+                            <LoaderCircle className="w-4 h-4 animate-spin" />
+                            Envoi...
+                        </>
+                    ) : initialData ? (
+                        <>
+                            <Pencil className="w-4 h-4" />
+                            Modifier
+                        </>
+                    ) : (
+                        <>
+                            <CirclePlus className="w-4 h-4" />
+                            Ajouter
+                        </>
+                    )}
                 </button>
             </div>
         </form>

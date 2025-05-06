@@ -5,6 +5,7 @@ import EnfantCard from '@/components/EnfantCard'
 import { UserPlus, Printer, Search, LoaderCircle } from 'lucide-react'
 import Link from 'next/link'
 import Can from "@/components/Can"
+import { toast } from 'react-hot-toast'
 
 export default function DashboardPage() {
     const [groupedData, setGroupedData] = useState({})
@@ -61,11 +62,15 @@ export default function DashboardPage() {
         if (!confirm("Êtes-vous sûr de vouloir supprimer cet enfant ?")) return
         try {
             const res = await fetch(`/api/enfants/${id}`, { method: 'DELETE' })
-            if (res.ok) removeEnfantFromState(id)
-            else alert("Échec de la suppression.")
+            if (res.ok) {
+                removeEnfantFromState(id)
+                toast.success("Enfant supprimé avec succès.")
+            } else {
+                toast.error("Échec de la suppression.")
+            }
         } catch (err) {
             console.error(err)
-            alert("Une erreur s'est produite.")
+            toast.error("Une erreur est survenue.")
         }
     }
 
@@ -76,11 +81,15 @@ export default function DashboardPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ est_archive: true }),
             })
-            if (res.ok) removeEnfantFromState(id)
-            else alert("Échec de l'archivage.")
+            if (res.ok) {
+                removeEnfantFromState(id)
+                toast.success("Enfant archivé avec succès.")
+            } else {
+                toast.error("Échec de l'archivage.")
+            }
         } catch (err) {
             console.error(err)
-            alert("Une erreur s'est produite.")
+            toast.error("Une erreur est survenue.")
         }
     }
 
@@ -155,4 +164,3 @@ export default function DashboardPage() {
         </div>
     )
 }
-
