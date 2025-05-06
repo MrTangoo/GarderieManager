@@ -1,16 +1,31 @@
 'use client'
 
-import Link from 'next/link'
 import { useSession, signOut } from 'next-auth/react'
+import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { LogOut } from 'lucide-react'
 
 export default function Navbar() {
     const { data: session, status } = useSession()
+    const [scrolled, setScrolled] = useState(false)
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 10)
+        }
+        window.addEventListener('scroll', handleScroll)
+        return () => window.removeEventListener('scroll', handleScroll)
+    }, [])
+
     if (status === 'loading') return null
 
     return (
-        <nav className="text-black px-4 py-3 flex justify-between items-center md:fixed z-10 w-full">
-            <div className="text-2xl font-semibold">
+        <nav
+            className={`fixed top-0 w-full z-10 px-4 py-3 flex justify-between items-center backdrop-blur-lg transition-all duration-300 ${
+                scrolled ? 'border-b border-gray-200' : 'border-b border-transparent'
+            }`}
+        >
+            <div className="text-2xl font-semibold text-black">
                 <Link href="/">Garderie Manager</Link>
             </div>
 

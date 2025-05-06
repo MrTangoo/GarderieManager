@@ -93,7 +93,7 @@ export default function DashboardPage() {
         "text-white px-4 py-2 rounded-xl shadow-sm font-medium flex items-center gap-2 transition-colors"
 
     return (
-        <div className="p-6 pt-20 max-w-5xl mx-auto space-y-8 h-full bg-[#f5fbff]">
+        <div className="p-6 md:pt-20 pt-25  max-w-5xl mx-auto space-y-8 h-full bg-[#f5fbff]">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                 <h1 className="text-4xl font-bold text-gray-800 text-center md:text-left">
                     Liste des enfants
