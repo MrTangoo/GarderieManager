@@ -23,26 +23,28 @@ model Enfant {
   adresse          String
   telephone_parent String
   est_archive      Boolean    @default(false)
-  presences        Presence[]
   createdAt        DateTime   @default(now())
+  presences        Presence[] @relation("EnfantPresence")
 }
 
 model JourPresence {
   id_jour      String     @id @default(uuid())
   jour_semaine String
-  presences    Presence[]
+  presences    Presence[] @relation("JourPresenceRelation")
   createdAt    DateTime   @default(now())
 }
 
 model Presence {
-  id_presence String       @id @default(uuid())
+  id_presence String  @id @default(uuid())
   id_enfant   String
   id_jour     String
   matin       Boolean
   apres_midi  Boolean
-  enfant      Enfant       @relation(fields: [id_enfant], references: [id_enfant])
-  jour        JourPresence @relation(fields: [id_jour], references: [id_jour])
-  createdAt   DateTime     @default(now())
+
+  enfant Enfant       @relation("EnfantPresence", fields: [id_enfant], references: [id_enfant], onDelete: Cascade)
+  jour   JourPresence @relation("JourPresenceRelation", fields: [id_jour], references: [id_jour], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
 }
 
 enum Role {

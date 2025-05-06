@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server'
 export async function middleware(req) {
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
 
-    if (!token && req.nextUrl.pathname === '/') {
+    if (!token) {
         return NextResponse.redirect(new URL('/login', req.url))
     }
 
@@ -12,5 +12,5 @@ export async function middleware(req) {
 }
 
 export const config = {
-    matcher: ['/'],
+    matcher: ['/dashboard/:path*', '/addEnfant/:path*', '/editEnfant/:path*'],
 }
