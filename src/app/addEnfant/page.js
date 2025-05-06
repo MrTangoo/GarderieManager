@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import EnfantForm from '@/components/EnfantForm'
+import { toast } from 'react-hot-toast'
 
 export default function AddEnfantPage() {
     const router = useRouter()
@@ -29,8 +30,8 @@ export default function AddEnfantPage() {
                 .map(([id_jour, value]) => ({
                     id_enfant: newEnfant.id_enfant,
                     id_jour,
-                    matin: value.matin,
-                    apres_midi: value.apres_midi,
+                    matin: value.matin ?? false,
+                    apres_midi: value.apres_midi ?? false,
                 }))
 
             if (presences.length > 0) {
@@ -45,16 +46,19 @@ export default function AddEnfantPage() {
                 )
             }
 
+            toast.success('Enfant ajouté avec succès !')
             router.push('/dashboard')
         } catch (err) {
             console.error(err)
-            alert("Une erreur est survenue lors de l'ajout.")
+            toast.error("Une erreur est survenue lors de l'ajout.")
         }
     }
 
     return (
         <div className="pt-24 px-4 max-w-xl mx-auto">
-            <h1 className="text-2xl font-bold mb-6 text-center">Ajouter un enfant</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-center text-gray-800 mb-6">
+                Ajouter un enfant
+            </h1>
             <EnfantForm onSubmit={handleAdd} />
         </div>
     )
