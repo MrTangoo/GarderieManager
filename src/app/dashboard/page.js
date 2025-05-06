@@ -89,21 +89,24 @@ export default function DashboardPage() {
         `${e.prenom} ${e.nom}`.toLowerCase().includes(searchTerm.toLowerCase())
     )
 
-    const buttonClass = "text-white px-4 py-2 rounded flex items-center gap-2"
+    const buttonClass =
+        "text-white px-4 py-2 rounded-xl shadow-sm font-medium flex items-center gap-2 transition-colors"
 
     return (
-        <div className="p-6 pt-20 max-w-4xl mx-auto space-y-6">
+        <div className="p-6 pt-20 max-w-5xl mx-auto space-y-8 h-full bg-[#f5fbff]">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                <h1 className="text-3xl font-bold text-center md:text-left">Liste des enfants</h1>
+                <h1 className="text-4xl font-bold text-gray-800 text-center md:text-left">
+                    Liste des enfants
+                </h1>
 
-                <div className="flex items-center border rounded-md px-3 py-2 w-full md:w-72">
-                    <Search className="w-4 h-4 text-gray-500 mr-2" />
+                <div className="flex items-center border border-gray-300 rounded-lg px-3 py-2 w-full md:w-80 bg-white shadow-sm focus-within:ring-2 focus-within:ring-blue-200">
+                    <Search className="w-4 h-4 text-gray-400 mr-2" />
                     <input
                         type="text"
                         placeholder="Rechercher un enfant"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full outline-none"
+                        className="w-full outline-none text-sm text-gray-700"
                     />
                 </div>
             </div>
@@ -113,34 +116,43 @@ export default function DashboardPage() {
                     <LoaderCircle className="w-6 h-6 animate-spin text-gray-500" />
                 </div>
             ) : (
-                <div className="space-y-6">
-                    {filteredEnfants.map((enfant) => (
-                        <EnfantCard
-                            key={enfant.id_enfant}
-                            enfant={enfant}
-                            onDelete={handleDelete}
-                            onArchive={handleArchive}
-                        />
-                    ))}
-                </div>
+                <>
+                    <div className="max-h-[697px] overflow-y-auto pr-2 space-y-6">
+                        {filteredEnfants.map((enfant) => (
+                            <EnfantCard
+                                key={enfant.id_enfant}
+                                enfant={enfant}
+                                onDelete={handleDelete}
+                                onArchive={handleArchive}
+                            />
+                        ))}
+                    </div>
+                    <div className="flex flex-col sm:flex-row justify-center gap-4 mt-10 px-4">
+                        <Can action="canCreate">
+                            <Link
+                                href="/addEnfant"
+                                className={`${buttonClass} bg-green-700 hover:bg-green-800 w-full sm:w-auto justify-center text-center`}
+                            >
+                                <UserPlus className="w-4 h-4" />
+                                Ajouter un enfant
+                            </Link>
+                        </Can>
+                        <button
+                            className={`${buttonClass} bg-cyan-500 hover:bg-cyan-700 w-full sm:w-auto justify-center text-center`}
+                        >
+                            <Printer className="w-4 h-4" />
+                            Présence hebdomadaire
+                        </button>
+                        <button
+                            className={`${buttonClass} bg-blue-500 hover:bg-blue-600 w-full sm:w-auto justify-center text-center`}
+                        >
+                            <Printer className="w-4 h-4" />
+                            Total Présence
+                        </button>
+                    </div>
+                </>
             )}
-
-            <div className="flex flex-col md:flex-row justify-center gap-4 mt-8">
-                <Can action="canCreate">
-                    <Link href="/addEnfant" className={`${buttonClass} bg-green-600 hover:bg-green-700`}>
-                        <UserPlus className="w-4 h-4" />
-                        Ajouter un enfant
-                    </Link>
-                </Can>
-                <button className={`${buttonClass} bg-blue-600 hover:bg-blue-700`}>
-                    <Printer className="w-4 h-4" />
-                    Présence hebdomadaire
-                </button>
-                <button className={`${buttonClass} bg-indigo-600 hover:bg-indigo-700`}>
-                    <Printer className="w-4 h-4" />
-                    Total Présence
-                </button>
-            </div>
         </div>
     )
 }
+
