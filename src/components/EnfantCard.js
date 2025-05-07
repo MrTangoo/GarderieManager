@@ -12,9 +12,9 @@ export default function EnfantCard({ enfant, onDelete, onArchive }) {
         <div className="mb-6 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
             <div className="flex justify-between items-start mb-4">
                 <div>
-                    <h2 className="text-xl font-semibold text-gray-800">
+                    <h2 className="text-xl font-semibold text-gray-800 capitalize">
                         {prenom} {nom}{' '}
-                        <span className="text-base font-normal text-gray-500">({age} ans)</span>
+                        <span className="text-base font-normal text-gray-500 normal-case">({age} ans)</span>
                     </h2>
                     <p className="text-sm text-gray-600 mt-1">Adresse : {adresse}</p>
                     <p className="text-sm text-gray-600">Téléphone parent : {telephone_parent}</p>

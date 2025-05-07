@@ -21,7 +21,7 @@ export default function Navbar() {
 
     return (
         <nav
-            className={`fixed top-0 w-full z-10 px-4 py-3 flex justify-between items-center backdrop-blur-lg transition-all duration-300 ${
+            className={`fixed top-0 w-full z-10 px-4 py-3 flex justify-between items-center backdrop-blur-lg transition-all duration-300 print:hidden ${
                 scrolled ? 'border-b border-gray-200' : 'border-b border-transparent'
             }`}
         >
