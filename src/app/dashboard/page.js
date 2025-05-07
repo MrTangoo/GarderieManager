@@ -6,11 +6,16 @@ import { UserPlus, Printer, Search, LoaderCircle } from 'lucide-react'
 import Link from 'next/link'
 import Can from "@/components/Can"
 import { toast } from 'react-hot-toast'
+import dynamic from 'next/dynamic'
+
+const HebdoPrint = dynamic(() => import('@/components/HebdoPrint'), { ssr: false })
+const TotalPrint = dynamic(() => import('@/components/TotalPrint'), { ssr: false })
 
 export default function DashboardPage() {
     const [groupedData, setGroupedData] = useState({})
     const [searchTerm, setSearchTerm] = useState('')
     const [loading, setLoading] = useState(true)
+    const [printMode, setPrintMode] = useState(null) // 'hebdo' ou 'total'
 
     useEffect(() => {
         const fetchData = async () => {
@@ -102,7 +107,7 @@ export default function DashboardPage() {
         "text-white px-4 py-2 rounded-xl shadow-sm font-medium flex items-center gap-2 transition-colors"
 
     return (
-        <div className="p-6 md:pt-20 pt-25  max-w-5xl mx-auto space-y-8 h-full bg-[#f5fbff]">
+        <div className="p-6 md:pt-20 pt-25 max-w-5xl mx-auto space-y-8 h-full bg-[#f5fbff]">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                 <h1 className="text-4xl font-bold text-gray-800 text-center md:text-left">
                     Liste des enfants
@@ -147,20 +152,26 @@ export default function DashboardPage() {
                             </Link>
                         </Can>
                         <button
+                            onClick={() => setPrintMode('hebdo')}
                             className={`${buttonClass} bg-cyan-500 hover:bg-cyan-700 w-full sm:w-auto justify-center text-center`}
                         >
                             <Printer className="w-4 h-4" />
                             Présence hebdomadaire
                         </button>
+
                         <button
+                            onClick={() => setPrintMode('total')}
                             className={`${buttonClass} bg-blue-500 hover:bg-blue-600 w-full sm:w-auto justify-center text-center`}
                         >
                             <Printer className="w-4 h-4" />
-                            Total Présence
+                            Présence totale
                         </button>
                     </div>
                 </>
             )}
+
+            {printMode === 'hebdo' && <HebdoPrint onDone={() => setPrintMode(null)} />}
+            {printMode === 'total' && <TotalPrint onDone={() => setPrintMode(null)} />}
         </div>
     )
 }
