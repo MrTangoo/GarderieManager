@@ -7,6 +7,7 @@ import Link from 'next/link'
 import Can from "@/components/Can"
 import { toast } from 'react-hot-toast'
 import dynamic from 'next/dynamic'
+import { motion } from 'framer-motion'
 
 const HebdoPrint = dynamic(() => import('@/components/HebdoPrint'), { ssr: false })
 const TotalPrint = dynamic(() => import('@/components/TotalPrint'), { ssr: false })
@@ -15,7 +16,8 @@ export default function DashboardPage() {
     const [groupedData, setGroupedData] = useState({})
     const [searchTerm, setSearchTerm] = useState('')
     const [loading, setLoading] = useState(true)
-    const [printMode, setPrintMode] = useState(null) // 'hebdo' ou 'total'
+    const [printMode, setPrintMode] = useState(null)
+    const [isFocused, setIsFocused] = useState(false) // <- focus state
 
     useEffect(() => {
         const fetchData = async () => {
@@ -24,7 +26,6 @@ export default function DashboardPage() {
                     fetch('/api/enfants'),
                     fetch('/api/presence'),
                 ])
-
                 const enfants = await enfantRes.json()
                 const presences = await presenceRes.json()
 
@@ -108,22 +109,34 @@ export default function DashboardPage() {
 
     return (
         <div className="p-6 md:pt-20 pt-25 max-w-5xl mx-auto space-y-8 h-full bg-[#f5fbff]">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+
+            <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="flex flex-col md:flex-row justify-between items-center gap-4"
+            >
                 <h1 className="text-4xl font-bold text-gray-800 text-center md:text-left">
                     Liste des enfants
                 </h1>
 
-                <div className="flex items-center border border-gray-300 rounded-lg px-3 py-2 w-full md:w-80 bg-white shadow-sm focus-within:ring-2 focus-within:ring-blue-200">
+                <motion.div
+                    animate={{ scale: isFocused ? 1.03 : 1 }}
+                    transition={{ type: 'spring', stiffness: 300 }}
+                    className="flex items-center border border-gray-300 rounded-lg px-3 py-2 w-full md:w-80 bg-white shadow-sm focus-within:ring-2 focus-within:ring-blue-200"
+                >
                     <Search className="w-4 h-4 text-gray-400 mr-2" />
                     <input
                         type="text"
                         placeholder="Rechercher un enfant"
                         value={searchTerm}
+                        onFocus={() => setIsFocused(true)}
+                        onBlur={() => setIsFocused(false)}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="w-full outline-none text-sm text-gray-700"
                     />
-                </div>
-            </div>
+                </motion.div>
+            </motion.div>
 
             {loading ? (
                 <div className="flex justify-center items-center py-20">
@@ -131,7 +144,12 @@ export default function DashboardPage() {
                 </div>
             ) : (
                 <>
-                    <div className="max-h-[697px] overflow-y-auto pr-2 space-y-6">
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.5, delay: 0.2 }}
+                        className="max-h-[697px] overflow-y-auto pr-2 space-y-6"
+                    >
                         {filteredEnfants.map((enfant) => (
                             <EnfantCard
                                 key={enfant.id_enfant}
@@ -140,33 +158,47 @@ export default function DashboardPage() {
                                 onArchive={handleArchive}
                             />
                         ))}
-                    </div>
-                    <div className="flex flex-col sm:flex-row justify-center gap-4 mt-10 px-4">
-                        <Can action="canCreate">
-                            <Link
-                                href="/addEnfant"
-                                className={`${buttonClass} bg-green-700 hover:bg-green-800 w-full sm:w-auto justify-center text-center`}
-                            >
-                                <UserPlus className="w-4 h-4" />
-                                Ajouter un enfant
-                            </Link>
-                        </Can>
-                        <button
-                            onClick={() => setPrintMode('hebdo')}
-                            className={`${buttonClass} bg-cyan-500 hover:bg-cyan-700 w-full sm:w-auto justify-center text-center`}
-                        >
-                            <Printer className="w-4 h-4" />
-                            Présence hebdomadaire
-                        </button>
+                    </motion.div>
 
-                        <button
-                            onClick={() => setPrintMode('total')}
-                            className={`${buttonClass} bg-blue-500 hover:bg-blue-600 w-full sm:w-auto justify-center text-center`}
-                        >
-                            <Printer className="w-4 h-4" />
-                            Présence totale
-                        </button>
-                    </div>
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.4 }}
+                        className="flex flex-col sm:flex-row justify-center gap-4 mt-10 px-4"
+                    >
+                        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }} transition={{ type: "spring", stiffness: 300 }}>
+                            <Can action="canCreate">
+                                <Link
+                                    href="/addEnfant"
+                                    className={`${buttonClass} bg-green-700 hover:bg-green-800 w-full sm:w-auto justify-center text-center`}
+                                >
+                                    <UserPlus className="w-4 h-4" />
+                                    Ajouter un enfant
+                                </Link>
+                            </Can>
+                        </motion.div>
+
+                        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }} transition={{ type: "spring", stiffness: 300 }}>
+                            <button
+                                onClick={() => setPrintMode('hebdo')}
+                                className={`${buttonClass} bg-cyan-500 hover:bg-cyan-700 w-full sm:w-auto justify-center text-center`}
+                            >
+                                <Printer className="w-4 h-4" />
+                                Présence hebdomadaire
+                            </button>
+                        </motion.div>
+
+                        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }} transition={{ type: "spring", stiffness: 300 }}>
+                            <button
+                                onClick={() => setPrintMode('total')}
+                                className={`${buttonClass} bg-blue-500 hover:bg-blue-700 w-full sm:w-auto justify-center text-center`}
+                            >
+                                <Printer className="w-4 h-4" />
+                                Présence totale
+                            </button>
+                        </motion.div>
+
+                    </motion.div>
                 </>
             )}
 
