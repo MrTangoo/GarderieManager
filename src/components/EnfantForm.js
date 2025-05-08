@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react'
 import { permissions } from '@/lib/permissions'
 import TextInputWithIcon from '@/components/TextInputWithIcon'
 import JourPresenceCard from '@/components/JourPresenceCard'
+import { motion } from 'framer-motion'
 
 
 export default function EnfantForm({ initialData = null, onSubmit }) {
@@ -101,60 +102,86 @@ export default function EnfantForm({ initialData = null, onSubmit }) {
     }
 
     return (
-        <form
+        <motion.form
             onSubmit={handleSubmit}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
             className="space-y-6 bg-white shadow-md border border-gray-200 p-6 rounded-xl"
         >
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <motion.div
+                className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+                initial="hidden"
+                animate="visible"
+                variants={{
+                    hidden: {},
+                    visible: {
+                        transition: {
+                            staggerChildren: 0.1,
+                        },
+                    },
+                }}
+            >
+                {[
+                    {
+                        value: formData.prenom,
+                        onChange: e => handleChange('prenom', e.target.value),
+                        placeholder: 'Prénom',
+                        icon: <Baby className="w-5 h-5" />,
+                        disabled: !canEdit,
+                    },
+                    {
+                        value: formData.nom,
+                        onChange: e => handleChange('nom', e.target.value),
+                        placeholder: 'Nom',
+                        icon: <Baby className="w-5 h-5" />,
+                        disabled: !canEdit,
+                    },
+                    {
+                        type: 'number',
+                        value: formData.age,
+                        onChange: e => handleChange('age', e.target.value === '' ? '' : Number(e.target.value)),
+                        placeholder: 'Age',
+                        icon: <Cake className="w-5 h-5" />,
+                        disabled: !canEdit,
+                        min: 1,
+                    },
+                    {
+                        type: 'tel',
+                        value: formData.telephone_parent,
+                        onChange: e => handleChange('telephone_parent', e.target.value),
+                        placeholder: 'Téléphone parent',
+                        icon: <Phone className="w-4 h-4" />,
+                        disabled: !canEdit,
+                        pattern: '^\+?[0-9]{10,15}$',
+                        title: 'Veuillez entrer un numéro valide (10 à 15 chiffres, avec un "+" possible)',
+                    },
+                ].map((props, i) => (
+                    <motion.div key={i} variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}>
+                        <TextInputWithIcon {...props} />
+                    </motion.div>
+                ))}
+            </motion.div>
+
+            <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+            >
                 <TextInputWithIcon
-                    value={formData.prenom}
-                    onChange={e => handleChange('prenom', e.target.value)}
-                    placeholder="Prénom"
-                    icon={<Baby className="w-5 h-5" />}
+                    value={formData.adresse}
+                    onChange={e => handleChange('adresse', e.target.value)}
+                    placeholder="Adresse"
+                    icon={<House className="w-5 h-5" />}
                     disabled={!canEdit}
                 />
+            </motion.div>
 
-                <TextInputWithIcon
-                    value={formData.nom}
-                    onChange={e => handleChange('nom', e.target.value)}
-                    placeholder="Nom"
-                    icon={<Baby className="w-5 h-5" />}
-                    disabled={!canEdit}
-                />
-
-                <TextInputWithIcon
-                    type="number"
-                    value={formData.age}
-                    onChange={e =>
-                        handleChange('age', e.target.value === '' ? '' : Number(e.target.value))
-                    }
-                    placeholder="Age"
-                    icon={<Cake className="w-5 h-5" />}
-                    disabled={!canEdit}
-                    min={1}
-                />
-
-                <TextInputWithIcon
-                    type="tel"
-                    value={formData.telephone_parent}
-                    onChange={e => handleChange('telephone_parent', e.target.value)}
-                    placeholder="Téléphone parent"
-                    icon={<Phone className="w-4 h-4" />}
-                    disabled={!canEdit}
-                    pattern="^\+?[0-9]{10,15}$"
-                    title="Veuillez entrer un numéro valide (10 à 15 chiffres, avec un '+' possible)"
-                />
-            </div>
-
-            <TextInputWithIcon
-                value={formData.adresse}
-                onChange={e => handleChange('adresse', e.target.value)}
-                placeholder="Adresse"
-                icon={<House className="w-5 h-5" />}
-                disabled={!canEdit}
-            />
-
-            <div>
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4 }}
+            >
                 <div className="flex items-center gap-2 mb-4 border-b border-gray-300 pb-2">
                     <h3 className="font-semibold text-xl text-gray-800">Présences hebdomadaires</h3>
                     <CalendarDays className="w-6 h-6 text-gray-700" />
@@ -173,9 +200,14 @@ export default function EnfantForm({ initialData = null, onSubmit }) {
                         />
                     ))}
                 </div>
-            </div>
+            </motion.div>
 
-            <div className="flex justify-center pt-4">
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="flex justify-center pt-4"
+            >
                 <button
                     type="submit"
                     disabled={isSubmitting}
@@ -200,7 +232,7 @@ export default function EnfantForm({ initialData = null, onSubmit }) {
                         </>
                     )}
                 </button>
-            </div>
-        </form>
+            </motion.div>
+        </motion.form>
     )
 }
