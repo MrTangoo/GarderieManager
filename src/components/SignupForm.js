@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { motion, AnimatePresence } from 'framer-motion'
 
 export default function SignupForm() {
     const [login, setLogin] = useState('')
@@ -29,7 +30,12 @@ export default function SignupForm() {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-[#f5fbff] px-4">
-            <div className="w-full max-w-md bg-white rounded-2xl shadow-md p-6 space-y-6">
+            <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="w-full max-w-md bg-white rounded-2xl shadow-md p-6 space-y-6"
+            >
                 <h1 className="text-3xl font-bold text-center text-gray-800">Créer un compte</h1>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -55,16 +61,27 @@ export default function SignupForm() {
                         />
                     </div>
 
-                    {error && (
-                        <p className="text-sm text-red-600 font-medium">{error}</p>
-                    )}
+                    <AnimatePresence>
+                        {error && (
+                            <motion.p
+                                initial={{ opacity: 0, y: -5 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -5 }}
+                                className="text-sm text-red-600 font-medium"
+                            >
+                                {error}
+                            </motion.p>
+                        )}
+                    </AnimatePresence>
 
-                    <button
+                    <motion.button
                         type="submit"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
                         className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-xl transition-colors shadow-sm"
                     >
                         S&apos;inscrire
-                    </button>
+                    </motion.button>
                 </form>
 
                 <p className="text-center text-sm text-gray-600">
@@ -73,7 +90,7 @@ export default function SignupForm() {
                         Se connecter
                     </Link>
                 </p>
-            </div>
+            </motion.div>
         </div>
     )
 }

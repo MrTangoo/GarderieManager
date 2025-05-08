@@ -4,6 +4,7 @@ import { useSession, signOut } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { LogOut } from 'lucide-react'
+import { motion } from 'framer-motion'
 
 export default function Navbar() {
     const { data: session, status } = useSession()
@@ -49,28 +50,36 @@ export default function Navbar() {
                                 />
                             </svg>
                         </div>
-                        <button
+
+                        <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.95 }}
                             onClick={() => signOut()}
                             className="text-sm hover:text-red-600 text-red-400 bg-red-100 font-bold py-1 px-2 rounded"
                             title="Se déconnecter"
                         >
                             <LogOut className="h-5 w-5" />
-                        </button>
+                        </motion.button>
                     </>
                 ) : (
                     <div className="flex gap-3">
-                        <Link
-                            href="/login"
-                            className="px-4 py-1.5 text-sm font-medium text-blue-600 border border-blue-600 rounded-xl shadow-sm hover:bg-blue-50 transition-colors"
-                        >
-                            Connexion
-                        </Link>
-                        <Link
-                            href="/signup"
-                            className="px-4 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-xl shadow-sm hover:bg-blue-700 transition-colors"
-                        >
-                            Inscription
-                        </Link>
+                        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                            <Link
+                                href="/login"
+                                className="px-4 py-1.5 text-sm font-medium text-blue-600 border border-blue-600 rounded-xl shadow-sm hover:bg-blue-50 transition-colors"
+                            >
+                                Connexion
+                            </Link>
+                        </motion.div>
+
+                        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                            <Link
+                                href="/signup"
+                                className="px-4 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-xl shadow-sm hover:bg-blue-700 transition-colors"
+                            >
+                                Inscription
+                            </Link>
+                        </motion.div>
                     </div>
                 )}
             </div>

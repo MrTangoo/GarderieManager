@@ -3,6 +3,8 @@ import EnfantTable from './EnfantTable'
 import Link from 'next/link'
 import Can from "@/components/Can"
 import IconButton from "@/components/IconButton"
+import { motion } from 'framer-motion'
+
 
 export default function EnfantCard({ enfant, onDelete, onArchive }) {
     const { id_enfant, prenom, nom, age, adresse, telephone_parent, presences } = enfant
@@ -21,44 +23,50 @@ export default function EnfantCard({ enfant, onDelete, onArchive }) {
                 </div>
 
                 <div className="flex gap-1 md:gap-3 pt-1 items-center">
-                    <div className="bg-orange-100 p-1 rounded-md">
-                        <Link
-                            href={`/editEnfant/${id_enfant}`}
-                            title="Éditer l'enfant"
-                            aria-label="Modifier"
+                    <Link
+                        href={`/editEnfant/${id_enfant}`}
+                        title="Éditer l'enfant"
+                        aria-label="Modifier"
+                    >
+                        <motion.div
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="bg-orange-100 p-1 rounded-md"
                         >
-                            <SquarePen
-                                className={`${iconClasses} text-yellow-500 hover:text-yellow-600`}
-                            />
-                        </Link>
-                    </div>
+                            <SquarePen className={`${iconClasses} text-yellow-500 hover:text-yellow-600`} />
+                        </motion.div>
+                    </Link>
 
                     <Can action="canArchive">
-                        <IconButton
-                            onClick={() => onArchive(id_enfant)}
-                            title="Archiver l'enfant"
-                            ariaLabel="Archiver"
-                            bgColor="bg-gray-100"
-                            icon={
-                                <Archive
-                                    className={`${iconClasses} text-gray-500 hover:text-gray-700`}
-                                />
-                            }
-                        />
+                        <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+                            <IconButton
+                                onClick={() => onArchive(id_enfant)}
+                                title="Archiver l'enfant"
+                                ariaLabel="Archiver"
+                                bgColor="bg-gray-100"
+                                icon={
+                                    <Archive
+                                        className={`${iconClasses} text-gray-500 hover:text-gray-700`}
+                                    />
+                                }
+                            />
+                        </motion.div>
                     </Can>
 
                     <Can action="canDelete">
-                        <IconButton
-                            onClick={() => onDelete(id_enfant)}
-                            title="Supprimer l'enfant"
-                            ariaLabel="Supprimer"
-                            bgColor="bg-red-100"
-                            icon={
-                                <Trash
-                                    className={`${iconClasses} text-red-700 hover:text-red-900`}
-                                />
-                            }
-                        />
+                        <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+                            <IconButton
+                                onClick={() => onDelete(id_enfant)}
+                                title="Supprimer l'enfant"
+                                ariaLabel="Supprimer"
+                                bgColor="bg-red-100"
+                                icon={
+                                    <Trash
+                                        className={`${iconClasses} text-red-700 hover:text-red-900`}
+                                    />
+                                }
+                            />
+                        </motion.div>
                     </Can>
                 </div>
             </div>
