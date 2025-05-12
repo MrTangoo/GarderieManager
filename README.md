@@ -1,4 +1,5 @@
 
+[![CI](https://github.com/MrTangoo/GarderieManager/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/MrTangoo/GarderieManager/actions/workflows/ci.yml)
 ## Installation
 
 1. Configure the environment variables inside the `.env` file.
