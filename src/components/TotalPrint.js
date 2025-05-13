@@ -39,23 +39,25 @@ export default function TotalPrint({ onDone }) {
                 presenceMap[id][jourNom].apres_midi ||= apres_midi
             })
 
-            const dataRows = enfants.map(({ id_enfant, nom, prenom }) => {
-                const joursData = jours.map(jour => {
-                    const p = presenceMap[id_enfant]?.[jour] || {}
-                    return { matin: !!p.matin, apres_midi: !!p.apres_midi }
+            const dataRows = enfants
+                .filter(e => !e.est_archive)
+                .map(({ id_enfant, nom, prenom }) => {
+                    const joursData = jours.map(jour => {
+                        const p = presenceMap[id_enfant]?.[jour] || {}
+                        return { matin: !!p.matin, apres_midi: !!p.apres_midi }
+                    })
+
+                    const total = joursData.reduce(
+                        (acc, { matin, apres_midi }) => {
+                            if (matin) acc.matin++
+                            if (apres_midi) acc.apres_midi++
+                            return acc
+                        },
+                        { matin: 0, apres_midi: 0 }
+                    )
+
+                    return { nom, prenom, jours: joursData, total }
                 })
-
-                const total = joursData.reduce(
-                    (acc, { matin, apres_midi }) => {
-                        if (matin) acc.matin++
-                        if (apres_midi) acc.apres_midi++
-                        return acc
-                    },
-                    { matin: 0, apres_midi: 0 }
-                )
-
-                return { nom, prenom, jours: joursData, total }
-            })
 
             dataRows.sort((a, b) =>
                 a.nom.localeCompare(b.nom, 'fr', { sensitivity: 'base' }) ||
@@ -83,15 +85,15 @@ export default function TotalPrint({ onDone }) {
                         {jours.map(jour => (
                             <th key={jour} colSpan="2" className="border p-2 capitalize">{jour}</th>
                         ))}
-                        <th rowSpan="2" className="border p-2 bg-gray-100">Matin</th>
                         <th rowSpan="2" className="border p-2 bg-gray-100">AM</th>
+                        <th rowSpan="2" className="border p-2 bg-gray-100">PM</th>
                         <th rowSpan="2" className="border p-2 bg-gray-200">Total</th>
                     </tr>
                     <tr>
                         {jours.map(jour => (
                             <React.Fragment key={`${jour}-labels`}>
-                                <th className="border p-1 text-xs">Matin</th>
                                 <th className="border p-1 text-xs">AM</th>
+                                <th className="border p-1 text-xs">PM</th>
                             </React.Fragment>
                         ))}
                     </tr>
@@ -121,8 +123,8 @@ export default function TotalPrint({ onDone }) {
                         <p className="flex items-center gap-1"><X className="text-red-500" size={14} /> = Absent</p>
                     </div>
                     <div className="flex flex-wrap gap-4 mt-2">
-                        <p><strong>Matin</strong> = Matinée</p>
-                        <p><strong>AM</strong> = Après-midi</p>
+                        <p><strong>AM</strong> = Matinée</p>
+                        <p><strong>PM</strong> = Après-midi</p>
                     </div>
                 </div>
             </div>
