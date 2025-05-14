@@ -18,9 +18,11 @@ export default function HebdoPrint({ onDone }) {
 
             raw.forEach(p => {
                 const jour = p?.jour?.jour_semaine
-                if ((p.matin || p.apres_midi) && grouped[jour]) {
+                const enfant = p?.enfant
+
+                if ((p.matin || p.apres_midi) && grouped[jour] && enfant && !enfant.est_archive) {
                     grouped[jour].push({
-                        prenom: p.enfant?.prenom || '',
+                        prenom: enfant.prenom || '',
                         matin: !!p.matin,
                         apres_midi: !!p.apres_midi,
                     })
