@@ -1,49 +1,53 @@
+## Présentation
+GarderieManager est un outil numérique moderne destiné aux structures de garde d’enfants. Il permet à votre personnel de gérer simplement les informations des enfants, d’enregistrer leurs présences (matin et après-midi), et de générer automatiquement des feuilles de suivi claires et imprimables.
+Chaque utilisateur dispose d’un accès personnalisé selon son rôle (éducateur, responsable, parent).
 
 ## Installation
 
-1. Configure the environment variables inside the `.env` file.
+1. Configurez les variables d’environnement dans le fichier `.env` :
 
 ```bash
-# The url of the database
+# URL de la base de données
 DATABASE_URL="postgres://user:password@localhost:5432/database"
 
-# Secret key used by NextAuth to sign JWT tokens and manage sessions.
+# Clé secrète utilisée par NextAuth pour signer les JWT et gérer les sessions
 NEXTAUTH_SECRET="une_clé_secrète_super_longue"
 
-# URL of your application, used for redirections and session management in NextAuth.
+# URL de l’application (utilisée pour les redirections et la gestion des sessions)
 NEXTAUTH_URL="http://localhost:3000"
 ```
 
-2. Install dependencies.
+2. Installez les dépendances :
   
 ```bash
 npm install
 ```
 
-3. Don't forget to seed the database. (See the Database & Prisma section)
+3. N’oubliez pas d’initialiser la base de données (voir section Base de données & Prisma).
 
-4. Run the application.
+4. Lancez l'application :
 ```bash
 npm run start
 ```
 
-## Database & Prisma
+## Base de données & Prisma
 
 ```bash
-# seed database
+# Peupler la base de données avec des données de test
 npx prisma db seed
 
-# push schema
+# Pousser le schéma vers la base de données
 npx prisma db push
 
-# lunch prisma studio
-npx prisma db push
+# Lancer Prisma Studio (interface de gestion visuelle de la base)
+npx prisma studio
 
-# generate schema
+# Générer le client Prisma
 npx prisma generate
+
 ```
 
-## Running the app
+## Lancer l'application en développement
 
 ```bash
 # development
@@ -51,13 +55,13 @@ npm run dev
 
 ```
 
-## Test
+## Tests
 
 ```bash
-# vitest
+# Exécuter tous les tests Vitest
 npm run test
 
-# vitest with ui
+# Lancer Vitest avec interface graphique
 npm run test:ui
 
 ```
